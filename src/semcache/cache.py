@@ -7,6 +7,7 @@ import threading
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable, Hashable
 
 import numpy as np
@@ -133,6 +134,21 @@ class SemanticCache:
         tokens = token_counter(response) if token_counter else 0
         self.store(prompt, response, namespace, tokens)
         return response
+
+    def save(self, path) -> "Path":
+        """Write all entries to a ``.npz`` file (see ``semcache.persistence``)."""
+        from .persistence import save
+
+        return save(self, path)
+
+    @classmethod
+    def load(cls, path, **kwargs) -> "SemanticCache":
+        """Create a cache with ``kwargs`` and fill it from a saved file."""
+        from .persistence import load_into
+
+        cache = cls(**kwargs)
+        load_into(cache, path)
+        return cache
 
     def clear(self) -> None:
         with self._lock:

@@ -26,6 +26,8 @@ repeats. An exact-match cache misses almost all of it. A semantic cache:
 - **Stats**: hit rate, tokens saved, evictions, mean similarity on hit
 - Pluggable embedders: an offline `HashingEmbedder` (default, zero downloads)
   or `SentenceTransformerEmbedder` for true paraphrase matching
+- **Persistence**: `cache.save("cache.npz")` / `SemanticCache.load("cache.npz")`,
+  keeping namespaces and remaining TTL
 - Thread-safe; `get_or_call` helper and a `@cache.cached()` decorator
 
 ## Quick start

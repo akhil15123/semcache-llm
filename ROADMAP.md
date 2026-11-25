@@ -7,7 +7,7 @@ Small, shippable steps. Each one should land with tests.
 - [x] Stats (hit rate, tokens saved, evictions)
 - [x] `get_or_call` and `@cached` decorator
 - [x] Offline benchmark with threshold sweep
-- [ ] Persistence: save/load cache to disk (`.npz` + JSON metadata)
+- [x] Persistence: save/load cache to disk (`.npz` + JSON metadata)
 - [ ] Async support (`aget_or_call`) for async LLM clients
 - [ ] Labelled paraphrase eval set; report precision/recall per threshold
 - [ ] Adaptive threshold: tune per namespace from feedback (wrong-hit reports)
