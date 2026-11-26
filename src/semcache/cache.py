@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import functools
 import threading
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Hashable
+from typing import Any, Awaitable, Callable, Hashable
 
 import numpy as np
 
@@ -70,6 +71,7 @@ class SemanticCache:
         self._next_id = 0
         self._lock = threading.RLock()
         self.stats = CacheStats()
+        self._inflight: dict[tuple[Hashable, str], asyncio.Future] = {}
 
     # ------------------------------------------------------------------ utils
     def __len__(self) -> int:
@@ -134,6 +136,56 @@ class SemanticCache:
         tokens = token_counter(response) if token_counter else 0
         self.store(prompt, response, namespace, tokens)
         return response
+
+    async def aget_or_call(
+        self,
+        prompt: str,
+        fn: Callable[[str], Awaitable[Any]],
+        namespace: Hashable = "default",
+        token_counter: Callable[[Any], int] | None = None,
+    ) -> Any:
+        """Async version of ``get_or_call`` for async LLM clients.
+
+        Embedding runs in a worker thread so a slow embedder does not block
+        the event loop. Concurrent calls with the *same* prompt and namespace
+        are coalesced: only one reaches ``fn``, the rest await its result.
+        """
+        hit = await asyncio.to_thread(self.lookup, prompt, namespace)
+        if hit is not None:
+            return hit.response
+
+        key = (namespace, prompt)
+        pending = self._inflight.get(key)
+        if pending is not None:
+            return await asyncio.shield(pending)
+
+        fut = asyncio.get_running_loop().create_future()
+        self._inflight[key] = fut
+        try:
+            response = await fn(prompt)
+            tokens = token_counter(response) if token_counter else 0
+            await asyncio.to_thread(self.store, prompt, response, namespace, tokens)
+            fut.set_result(response)
+            return response
+        except BaseException as exc:
+            fut.set_exception(exc)
+            fut.exception()  # mark retrieved so waiters-less failures don't warn
+            raise
+        finally:
+            del self._inflight[key]
+
+    def acached(self, namespace_fn: Callable[..., Hashable] | None = None):
+        """Async counterpart of ``cached`` for ``async def fn(prompt, **kwargs)``."""
+
+        def decorator(fn):
+            @functools.wraps(fn)
+            async def wrapper(prompt: str, **kwargs):
+                ns = namespace_fn(**kwargs) if namespace_fn else tuple(sorted(kwargs.items()))
+                return await self.aget_or_call(prompt, lambda p: fn(p, **kwargs), namespace=ns)
+
+            return wrapper
+
+        return decorator
 
     def save(self, path) -> "Path":
         """Write all entries to a ``.npz`` file (see ``semcache.persistence``)."""
