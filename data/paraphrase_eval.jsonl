@@ -1,0 +1,40 @@
+{"a": "How do I reset my password?", "b": "how can i reset my password", "same": true}
+{"a": "How do I reset my password?", "b": "I forgot my password, how do I reset it?", "same": true}
+{"a": "What are your opening hours?", "b": "when are you open", "same": true}
+{"a": "What are your opening hours?", "b": "opening hours please", "same": true}
+{"a": "How can I cancel my subscription?", "b": "cancel my subscription", "same": true}
+{"a": "How can I cancel my subscription?", "b": "I want to stop my subscription", "same": true}
+{"a": "Where is my order?", "b": "where's my order??", "same": true}
+{"a": "Where is my order?", "b": "track my order status", "same": true}
+{"a": "Do you ship internationally?", "b": "do you ship to other countries", "same": true}
+{"a": "Do you ship internationally?", "b": "international shipping available?", "same": true}
+{"a": "How do I change my email address?", "b": "change the email on my account", "same": true}
+{"a": "What payment methods do you accept?", "b": "which payment methods are accepted", "same": true}
+{"a": "What payment methods do you accept?", "b": "can I pay with paypal", "same": true}
+{"a": "How do I get a refund?", "b": "refund request how", "same": true}
+{"a": "How do I get a refund?", "b": "I want my money back", "same": true}
+{"a": "Explain retrieval augmented generation", "b": "what is RAG in LLMs", "same": true}
+{"a": "Explain retrieval augmented generation", "b": "explain retrieval-augmented generation", "same": true}
+{"a": "What is overfitting in machine learning?", "b": "define overfitting", "same": true}
+{"a": "Summarise this article in three bullets", "b": "give me a 3 bullet summary of this article", "same": true}
+{"a": "Translate hello to French", "b": "how do you say hello in french", "same": true}
+{"a": "How do I reset my password?", "b": "How do I change my email address?", "same": false}
+{"a": "How do I reset my password?", "b": "reset my router", "same": false}
+{"a": "What are your opening hours?", "b": "What payment methods do you accept?", "same": false}
+{"a": "How can I cancel my subscription?", "b": "How can I upgrade my subscription?", "same": false}
+{"a": "How can I cancel my subscription?", "b": "cancel my order", "same": false}
+{"a": "Where is my order?", "b": "Where is your store?", "same": false}
+{"a": "Do you ship internationally?", "b": "Do you offer free shipping?", "same": false}
+{"a": "How do I get a refund?", "b": "How do I get an invoice?", "same": false}
+{"a": "What payment methods do you accept?", "b": "What languages do you support?", "same": false}
+{"a": "Explain retrieval augmented generation", "b": "Explain reinforcement learning", "same": false}
+{"a": "What is overfitting in machine learning?", "b": "What is underfitting in machine learning?", "same": false}
+{"a": "Translate hello to French", "b": "Translate hello to German", "same": false}
+{"a": "Summarise this article in three bullets", "b": "Write an article in three bullets", "same": false}
+{"a": "What is the capital of France?", "b": "What is the capital of Spain?", "same": false}
+{"a": "Is python faster than java?", "b": "Is java faster than python?", "same": false}
+{"a": "Write a haiku about rain", "b": "Write a limerick about rain", "same": false}
+{"a": "Convert 10 km to miles", "b": "Convert 10 miles to km", "same": false}
+{"a": "What is 2+2?", "b": "What is 2*2?", "same": false}
+{"a": "Book a table for two", "b": "Cancel my table for two", "same": false}
+{"a": "Turn on the lights", "b": "Turn off the lights", "same": false}

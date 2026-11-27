@@ -83,6 +83,34 @@ prompt ──► embed ──► cosine vs. entries in same namespace ──► 
 The perturbations here are surface-level; true paraphrases need a neural
 embedder (see the roadmap for a labelled paraphrase eval).
 
+## Threshold evaluation (labelled paraphrases)
+
+`data/paraphrase_eval.jsonl` holds 40 labelled prompt pairs: 20 true
+paraphrases ("I want my money back" vs "How do I get a refund?") and 20 hard
+negatives that share most words but need different answers ("Turn on the
+lights" vs "Turn off the lights", "Convert 10 km to miles" vs the reverse).
+
+```bash
+python examples/eval_thresholds.py        # offline hashing embedder
+python examples/eval_thresholds.py --st   # sentence-transformers
+```
+
+Hashing embedder results:
+
+| threshold | precision | recall | false hits |
+|-----------|----------:|-------:|-----------:|
+| 0.50      | 0.476     | 0.500  | 11         |
+| 0.70      | 0.545     | 0.300  | 5          |
+| 0.80      | 0.625     | 0.250  | 3          |
+| 0.95      | 0.667     | 0.100  | 1          |
+
+No threshold reaches the 0.95 precision target. Lexical features can't tell
+"on" from "off" or catch "money back" ≈ "refund". That's the core lesson
+of this eval: the cache is only as safe as its embedder, so use a neural
+embedder in production and pick the threshold from this sweep, not by feel.
+`semcache.evaluation.best_threshold()` picks the highest-recall threshold that
+meets a precision floor.
+
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md).

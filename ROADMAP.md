@@ -9,7 +9,7 @@ Small, shippable steps. Each one should land with tests.
 - [x] Offline benchmark with threshold sweep
 - [x] Persistence: save/load cache to disk (`.npz` + JSON metadata)
 - [x] Async support (`aget_or_call`, `@acached`) with in-flight request coalescing
-- [ ] Labelled paraphrase eval set; report precision/recall per threshold
+- [x] Labelled paraphrase eval set; report precision/recall per threshold
 - [ ] Adaptive threshold: tune per namespace from feedback (wrong-hit reports)
 - [ ] Approximate search backend (FAISS / hnswlib) for >100k entries
 - [ ] Streaming responses: cache the assembled stream, replay as chunks
