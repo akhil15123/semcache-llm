@@ -30,6 +30,9 @@ repeats. An exact-match cache misses almost all of it. A semantic cache:
   keeping namespaces and remaining TTL
 - **Async**: `await cache.aget_or_call(prompt, async_llm)` and `@cache.acached()`;
   concurrent identical requests are coalesced into one LLM call
+- **Feedback loop**: `cache.report_wrong_hit(hit)` raises that namespace's
+  threshold just above the bad hit's similarity; `cache.confirm_hit(hit)`
+  relaxes it back toward the base over time
 - Thread-safe; `get_or_call` helper and a `@cache.cached()` decorator
 
 ## Quick start

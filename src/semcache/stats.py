@@ -10,6 +10,7 @@ class CacheStats:
     evictions: int = 0
     expirations: int = 0
     tokens_saved: int = 0
+    wrong_hits: int = 0
     similarity_on_hit: list[float] = field(default_factory=list)
 
     @property
@@ -30,5 +31,6 @@ class CacheStats:
             "evictions": self.evictions,
             "expirations": self.expirations,
             "tokens_saved": self.tokens_saved,
+            "wrong_hits": self.wrong_hits,
             "mean_hit_similarity": round(sum(sims) / len(sims), 4) if sims else None,
         }

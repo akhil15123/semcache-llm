@@ -32,6 +32,7 @@ class CacheHit:
     response: Any
     similarity: float
     cached_prompt: str
+    namespace: Hashable = "default"
 
 
 class SemanticCache:
@@ -71,6 +72,9 @@ class SemanticCache:
         self._next_id = 0
         self._lock = threading.RLock()
         self.stats = CacheStats()
+        self._ns_threshold: dict[Hashable, float] = {}
+        self.feedback_margin = 0.01
+        self.relax_step = 0.002
         self._inflight: dict[tuple[Hashable, str], asyncio.Future] = {}
 
     # ------------------------------------------------------------------ utils
@@ -103,7 +107,7 @@ class SemanticCache:
             sims = np.stack([e.vector for e in entries]) @ vec
             best = int(np.argmax(sims))
             score = float(sims[best])
-            if score < self.threshold:
+            if score < self.threshold_for(namespace):
                 self.stats.misses += 1
                 return None
             key, entry = keys[best], entries[best]
@@ -111,7 +115,41 @@ class SemanticCache:
             self.stats.hits += 1
             self.stats.tokens_saved += entry.tokens
             self.stats.similarity_on_hit.append(score)
-            return CacheHit(entry.response, score, entry.prompt)
+            return CacheHit(entry.response, score, entry.prompt, namespace)
+
+    # ------------------------------------------------------------ feedback
+    def threshold_for(self, namespace: Hashable = "default") -> float:
+        """Effective hit threshold for ``namespace`` (base threshold if never tuned)."""
+        return self._ns_threshold.get(namespace, self.threshold)
+
+    def report_wrong_hit(self, hit: CacheHit) -> float:
+        """Tell the cache a served hit was wrong for the new prompt.
+
+        The namespace threshold is raised just above that hit's similarity, so
+        the same near-miss can't be served again there. Other namespaces are
+        unaffected. Returns the new threshold.
+        """
+        with self._lock:
+            self.stats.wrong_hits += 1
+            new = min(1.0, max(self.threshold_for(hit.namespace), hit.similarity + self.feedback_margin))
+            self._ns_threshold[hit.namespace] = new
+            return new
+
+    def confirm_hit(self, hit: CacheHit) -> float:
+        """Tell the cache a served hit was correct.
+
+        Relaxes a previously raised namespace threshold by ``relax_step`` per
+        confirmation, never below the base ``threshold``, so one bad report
+        doesn't cost recall forever. Returns the new threshold.
+        """
+        with self._lock:
+            current = self.threshold_for(hit.namespace)
+            new = max(self.threshold, current - self.relax_step)
+            if new == self.threshold:
+                self._ns_threshold.pop(hit.namespace, None)
+            else:
+                self._ns_threshold[hit.namespace] = new
+            return new
 
     def store(self, prompt: str, response: Any, namespace: Hashable = "default", tokens: int = 0) -> None:
         vec = self._embed_one(prompt)

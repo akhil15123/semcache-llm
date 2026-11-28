@@ -10,7 +10,8 @@ Small, shippable steps. Each one should land with tests.
 - [x] Persistence: save/load cache to disk (`.npz` + JSON metadata)
 - [x] Async support (`aget_or_call`, `@acached`) with in-flight request coalescing
 - [x] Labelled paraphrase eval set; report precision/recall per threshold
-- [ ] Adaptive threshold: tune per namespace from feedback (wrong-hit reports)
+- [x] Adaptive threshold: tune per namespace from feedback (wrong-hit reports)
+- [ ] Persist tuned namespace thresholds in `save`/`load`
 - [ ] Approximate search backend (FAISS / hnswlib) for >100k entries
 - [ ] Streaming responses: cache the assembled stream, replay as chunks
 - [ ] CLI: `semcache stats`, `semcache warm --file prompts.jsonl`
